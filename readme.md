@@ -1,3 +1,8 @@
+#Tomato Interns Bioinformatics Week
+
+Scripts, outline, and course material for teaching tomato interns.
+
+#Outline
 ## Day 1: Intro to Atmosphere and Unix (MFC)
 * what is atmosphere
 * starting an instance
