@@ -2,6 +2,15 @@
 
 Scripts, outline, and course material for teaching tomato interns.
 
+### Meeting times and locations
+**Week of July 29, 2013**
+
+* Monday 2:00 - 5:00 LS3002
+* Tuesday 2:00 - 5:00 LS3002
+* Wednesday 2:00 - 5:00 LS2002
+* Thursday 1:00 - 4:00 LS2002
+* Friday 2:00 - 5:00 LS2002
+
 ##Outline
 ### Day 1: Intro to Atmosphere and Unix (MFC)
 * what is atmosphere?
@@ -31,12 +40,11 @@ Scripts, outline, and course material for teaching tomato interns.
 			* grep
 				* possibly with some regex (simple!)
 			* pipes
-				* could grep for machine name, etc and pipe to wc
-				* and then illustrate that grep -c does the same...
 			* man
 * Looking at fastq files (applying what they learned)
 	* use head, tail, etc to examine fastq files
-	* stare at organization of fastq file to see if they can generate some hypotheses about how they are organized...
+		* examine fastq file: have students describe how they appear to be organized
+	* exercises with grep and wc, e.g. number of reads
 	* grep -c
 
 ### Day 2:  Processing fastq files (MFC)
