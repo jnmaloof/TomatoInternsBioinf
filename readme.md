@@ -1,9 +1,9 @@
-#Tomato Interns Bioinformatics Week
+##Tomato Interns Bioinformatics Week
 
 Scripts, outline, and course material for teaching tomato interns.
 
-#Outline
-## Day 1: Intro to Atmosphere and Unix (MFC)
+##Outline
+### Day 1: Intro to Atmosphere and Unix (MFC)
 * what is atmosphere
 * starting an instance
 * connecting to your instance
@@ -39,7 +39,7 @@ Scripts, outline, and course material for teaching tomato interns.
 	* stare at organization of fastq file to see if they can generate some hypotheses about how they are organized...
 	* grep -c
 
-## Day 2:  Processing fastq files (MFC)
+### Day 2:  Processing fastq files (MFC)
 * What files do we actually get back from the sequencing facility
 * QualityCheck
 	* go through FastQC, what the differenet measures mean, etc
@@ -54,7 +54,7 @@ Scripts, outline, and course material for teaching tomato interns.
 * Stats for mapping: 
 	* how many ready mapped?
 	
-## Day 3: Visualization 
+### Day 3: Visualization 
 * IGV (MFC)
 	* can you find genes that appear up-regulated?
 		* think about normalization
@@ -70,7 +70,7 @@ Scripts, outline, and course material for teaching tomato interns.
 * 2 way comparisons
 * 2 way comparisons (with interactions!)
 
-## Day 5 (JNM)
+### Day 5 (JNM)
 * What do you do with these results?
 * GO category enrichment
 * plotting particular genes of interest
