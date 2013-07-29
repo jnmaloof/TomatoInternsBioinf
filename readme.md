@@ -41,7 +41,7 @@ Scripts, outline, and course material for teaching tomato interns.
 				* possibly with some regex (simple!)
 			* pipes
 			* man
-* Looking at fastq files (applying what they learned)
+* Looking at fastq files (applying was learned)
 	* use head, tail, etc to examine fastq files
 		* examine fastq file: have students describe how they appear to be organized
 	* exercises with grep and wc, e.g. number of reads
