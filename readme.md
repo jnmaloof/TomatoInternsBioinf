@@ -48,6 +48,15 @@ Scripts, outline, and course material for teaching tomato interns.
 	* grep -c
 
 ### Day 2:  Processing fastq files (MFC)
+* Questions/ starting problem set:
+	* create a new directory in /mydata
+	* navigate to directory in iRods with sequence files
+	* how many files are in the directory?
+	* download your desiganated file to the new directory in /mydata
+	* What is the machine name that the sequences come from?
+	* How many lines are in the file?
+	* How many sequence records are in the file?
+	* create a new file that contains 1,000,000 records from the file you downloaded
 * What files do we actually get back from the sequencing facility
 * QualityCheck
 	* go through FastQC, what the differenet measures mean, etc
