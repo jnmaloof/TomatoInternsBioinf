@@ -79,7 +79,7 @@ Scripts, outline, and course material for teaching tomato interns.
 * Sam2Counts.R (JNM)
 * Histograms of read counts (R) (JNM)
 
-## Day 4: Differential Expression (JNM)
+### Day 4: Differential Expression (JNM)
 * normalization
 * what does differential expression mean?
 * the idea of a linear model
