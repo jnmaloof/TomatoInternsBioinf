@@ -1,3 +1,9 @@
+# Navigation
+
+Changing to our iRODS directory
+
+    icd /iplant/home/shared/ucd.tomato/ti-2013
+
 # Preparing FASTQ sequence files
 
 Quality filter FASTQ file
