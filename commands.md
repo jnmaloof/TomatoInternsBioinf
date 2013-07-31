@@ -8,7 +8,7 @@ Changing to our iRODS directory
 
 Quality filter FASTQ file
 
-    fastq_quality_filter -v -Q33 -q 20 -p 90 -i ID.fq -o ID.q20p90.fq
+    fastq_quality_filter -v -Q33 -q 20 -p 90 -i ID.fq -o q20p90.ID.fq
 
 FASTQC quality analysis
 
@@ -22,13 +22,13 @@ index FASTA file (only needs to be done once)
 
 align FASTQ file to reference
 
-    bwa aln -f ID.q20p90.sai -t 2 ITAG2.3_cdna_SHORTNAMES.fasta ID.q20p90.fq
+    bwa aln -f q20p90.ID.sai -t 2 ITAG2.3_cdna_SHORTNAMES.fasta q20p90.ID.fq
 
 convert sequence alignment index (.sai) file to .sam format
 
-    bwa samse -n1 -f ID.q20p90.sam ITAG2.3_cdna_SHORTNAMES.fasta ID.q20p90.sai ID.q20p90.fq
+    bwa samse -n1 -f q20p90.ID.sam ITAG2.3_cdna_SHORTNAMES.fasta q20p90.ID.sai q20p90.ID.fq
 
 convert .sam file to binary .bam format
 
-    samtools view -Sb ID.q20p90.sam > ID.q20p90.bam
+    samtools view -Sb q20p90.ID.sam > q20p90.ID.bam
 
