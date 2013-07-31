@@ -39,7 +39,7 @@ Lets see what the script did.
 
 The counts are in an R object "results".
 
-Do you remember how to look at the beginning of this object and how to get a summary?  Do so now.  Describe the orientation of the object.
+Do you remember how to look at the beginning of this object and how to get a summary?  Do so now.  Describe the what you think each row and column represents
 
 It also would be nice to look at a histogram of read counts.
 
