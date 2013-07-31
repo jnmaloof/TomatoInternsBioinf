@@ -61,10 +61,14 @@ What does this histogram tell us?  It is pretty hard to read because of the y-ax
 
 ### Histogram of multiple columns
 
-    library(reshape)
+If we have counts from multiple bam/sam files then we can plot a histogram for each, separately.  To do this we first have to rearrange, or melt, our counts object so that each row corresponds to a single object.
+
+    library(reshape) 
     results.m <- melt(results,id.vars="gene")
 
     head(results.m)
+
+Now that we have our melted file, we can use it in ggplot.  facet_wrap tells ggplot to make a separate histogram for each bam/sam file
 
     pl <- ggplot(data=results.m,aes(x=value,fill=variable)) + geom_histogram() 
     pl <- pl + scale_y_sqrt() + facet_wrap(~ variable)
