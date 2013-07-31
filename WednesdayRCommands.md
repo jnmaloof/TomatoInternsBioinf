@@ -76,3 +76,9 @@ Now that we have our melted file, we can use it in ggplot.  facet_wrap tells ggp
 
 
 
+
+#### NOTE: To move all bam files to the same directory, run the following
+
+	cd /mydata/
+	cp LYC.mapped/q20p90.LYC-*bam map/
+
