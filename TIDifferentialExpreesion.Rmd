@@ -193,7 +193,37 @@ sum(topTags(lrt.temp,n=Inf)$table$adj.P.Val < 0.01)
 ```
 
 #### Exercise 8
-Find the top genes differentially expressed in ARC relative to LYC by changing temperature.  Do a separate analysis to find genes cold induced/repressed genes in HAB relative to LYC.  How many genes are there in each analysis?
-```{r}
+Find the top genes differentially expressed in ARC relative to LYC in response to temperature.  Do a separate analysis to find genes with differential temperature response in HAB relative to LYC.  How many genes are there in each analysis?
+```{r,echo=FALSE,results='hide' }
+lrt.temp.ArcVsLyc <- glmLRT(dge, fit, coef=c(5))
+topTags(lrt.temp.ArcVsLyc)
+sum(topTags(lrt.temp.ArcVsLyc,n=Inf)$table$adj.P.Val < 0.01)
+lrt.temp.HabVsLyc <- glmLRT(dge, fit, coef=c(6))
+topTags(lrt.temp.HabVsLyc)
+sum(topTags(lrt.temp.HabVsLyc,n=Inf)$table$adj.P.Val < 0.01)
+```
 
+### Finding all genes differentialy induced or repressed by temperature for each species.
+The above analyses revealed all genes DE by temperature, or all genes whose respnse to temperature is different in ARC or HAB compared to LYC.  What if instead, for each species, we wanted to know which genes were responsive to temperature?
+
+For LYC this is just the temp8 coefficient:
+```{r}
+lrt.temp.lyc <- glmLRT(dge, fit, coef=4)
+topTags(lrt.temp.lyc)
+sum(topTags(lrt.temp.lyc,n=Inf)$table$adj.P.Val < 0.01)
+```
+
+For ARC we want to compare the ARC column (which is really ARC.25) to the ARC:temp8 column.  For this we have to use contrasts...
+```{r}
+lrt.temp.arc <- glmLRT(dge, fit, contrast=c(0,-1,0,0,1,0)) #note we use "contrast"" rather than "coef".  0s indicate columns we don't want to analyze.  we use -1 and +1 for the columns we want to compare
+topTags(lrt.temp.arc)
+sum(topTags(lrt.temp.arc,n=Inf)$table$adj.P.Val < 0.01)
+```
+
+#### Exercise 9
+how many genes are DE in HAB.25 vs HAB.8?  Which species has the most number of genes that respond to temperature?
+```{r,echo=FALSE,results='hide'}
+lrt.temp.hab <- glmLRT(dge, fit, contrast=c(0,0,-1,0,0,1)) #note we use "contrast"" rather than "coef".  0s indicate columns we don't want to analyze.  we use -1 and +1 for the columns we want to compare
+topTags(lrt.temp.arc)
+sum(topTags(lrt.temp.arc,n=Inf)$table$adj.P.Val < 0.01)
 ```
