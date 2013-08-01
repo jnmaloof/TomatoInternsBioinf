@@ -3,6 +3,9 @@ Differential Gene Expression Analysis in R
 
 Yesterday we finished by running SamBam2counts.R to determine the number of counts per gene.  Login to Rstudio Server (point the browser on your laptop to 128.196.142.XXX:8787, *replacing* XXX with the correct digits for your atmosphere instance).
 
+### Getting started
+It is best to keep a script of your commands in R.  This serves as a record of what you have done and makes it easier to correct mistakes.  To start a new script, click "File>New>Rscript" in the Rstudio window.  As you work through today's exercise, type the commands into your new R script.  You can execute each line, or a selection of lines, by typeing ctrl-enter or cmd-enter.  You can save your script by choosing "File>Save" from the Rstudio menu, or clicking on the disk drive icon.
+
 ### Summarizing counts
 The results of this analysis should be present in an object called results.  We can examine the beginning of the file by using `head()` and get a summary with `summary()`
 
@@ -172,7 +175,7 @@ topTags(lrt.species) # shows us the 10 most differentially expressed genes among
 sum(topTags(lrt.species,n=Inf)$table$adj.P.Val < 0.01) #shows the total number of genes differentially expressed among species at P < 0.01
 ```
 What do the columns in the topTags table mean?  
-* logConc: This is for the "refernce" condution of LYC.25.  It gives the log2 "concentration" of reads, calculated as log2(read counts in this gene / total read counts)
+* logConc: This is for the "reference" condition of LYC.25.  It gives the log2 "concentration" of reads, calculated as log2(read counts in this gene / total read counts)
 * speciesARC: the difference between the reference condition (LYC.25) and ARC.25 in log2 units.  so -1 means that the gene is 2-fold less expressed in ARC than LYC
 * speciesHAB: as above, but for HAB
 * speciesARC.temp8: the difference between ARC.temp8-ARC.temp25 and LYC.temp8-LYC.temp25.  How much more (or less) did ARC respond to 8 than LYC did?
