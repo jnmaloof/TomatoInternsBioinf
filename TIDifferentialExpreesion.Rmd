@@ -1,0 +1,229 @@
+Differential Gene Expression Analysis in R
+========================================================
+
+Yesterday we finished by running SamBam2counts.R to determine the number of counts per gene.  Login to Rstudio Server (point the browser on your laptop to 128.196.142.XXX:8787, *replacing* XXX with the correct digits for your atmosphere instance).
+
+### Getting started
+It is best to keep a script of your commands in R.  This serves as a record of what you have done and makes it easier to correct mistakes.  To start a new script, click "File>New>Rscript" in the Rstudio window.  As you work through today's exercise, type the commands into your new R script.  You can execute each line, or a selection of lines, by typeing ctrl-enter or cmd-enter.  You can save your script by choosing "File>Save" from the Rstudio menu, or clicking on the disk drive icon.
+
+### Summarizing counts
+The results of this analysis should be present in an object called results.  We can examine the beginning of the file by using `head()` and get a summary with `summary()`
+
+```{r, echo=FALSE,results='hide'}
+setwd("/mydata")
+results <- read.delim("SamBam2countsResults.tsv",sep="\t")
+```
+
+```{r}
+head(results)
+summary(results)
+```
+
+*if the above commands worked you can skip this section*
+If your session ended, crashed, or otherwise isn't working, the file might have been saved in /mydata .  If you need to restart Rstudioserver, remember to move to the /mydata directory at set it as the working directory (see yesterday's instructions).  See if you have a file SamBam2countsResults.tsv in your /mydata directory.  If not you can download a copy from the ti-2013 directory on irods.
+
+```{r, eval=FALSE}
+#ONLY EXECUTE IF THE HEAD() AND SUMMARY() COMMANDS ABOVE DID NOT WORK
+#load results from disk
+results <- read.delim("SamBam2countsResults.tsv",sep="\t")
+```
+
+#### Exercise 1:
+What do the rows and columns represent?  What do you think the first row represents?
+
+### Cleaning up column names
+We need to make the column names conform to R standards and remove some extraneous characters:
+```{r}
+#note that anything after a "#" sign is a comment and does not need to be typed.
+colnames(results) <- make.names(colnames(results)) #removes illegal characters
+colnames(results) <- sub("q20p90.","",colnames(results),fixed=T) #remove "q20p90" from column names
+colnames(results) <- sub(".bam","",colnames(results),fixed=T) #remove ".bam" from column names
+```
+
+### Fixing "NAs"
+If no counts were found, SamBam2counts.R inserted a value of "NA".  Really these are genes with 0 counts, and we need to replace NA with 0
+```{r replace_NA}
+results[is.na(results)] <- 0
+```
+
+### Plotting a histogram
+
+To get a visual summary of the results we can plot a histogram.  We will start by doing this for the first column:
+
+```{r basic_histogram}
+results.gene <- results[-1,]
+hist(results.gene$LYC.25.1)
+```
+
+#### Exercise 2:
+What did this command do: `results.gene <- results[-1,]` ?
+
+#### Exercise 3:
+Does this histogram seem useful?
+
+The problem with the histogram is that too many samples have low counts so it is hard to see most of the data.  We can rectify that by changing the y-axis.  We will turn to ggplot for this analysis
+
+```{r ggplot_histogram}
+library(ggplot2) #load additional functionality
+pl <- ggplot(data=results.gene, aes(x=LYC.25.1)) 
+pl <- pl + geom_histogram(binwidth=100) 
+pl <- pl + scale_y_sqrt() + ylab("number of genes") + xlab("read count")
+pl
+```
+
+If we want to just look at the lower left portion:
+```{r ggplot_histogram_v2}
+pl + xlim(c(0,5000)) #genes with between 0 and 5000 counts
+pl + xlim(c(0,1000)) #genes with between 0 and 1000 counts
+```
+
+#### Exercise 4:
+Interpret the histogram.  What does each axis represent.  Can you describe the distribution of gene expression in a sentence or two?
+
+We can also use ggplot to make a histogram of each sample.  In order to do this we must rearrange the data in the data frame so that each row corresponds to a single observation
+```{r melt}
+library(reshape)
+results.gene.melt <- melt(results.gene,id.var="gene") #id.var tells R which column has identifing information
+#lets look at what we have done and compare it to the original
+head(results.gene.melt)
+tail(results.gene.melt)
+head(results.gene)
+tail(results.gene)
+```
+
+#### Exercise 5:
+What are "value" and "variable" in the results.gene.melt data frame?
+
+now we can plot multiple histograms easily
+```{r ggplot_faceted_histogram, results='hide'}
+pl <- ggplot(data=results.gene.melt,aes(x=value,fill=variable))
+pl <- pl + geom_histogram(binwidth=100)
+pl <- pl + facet_wrap(~ variable,ncol=5) #tells R to plot a separate histogram for each level of "variable"
+pl <- pl + scale_y_sqrt() + ylab("number of genes") + xlab("read count")
+pl 
+```
+You may want to press on the "zoom" button to see the plot more clearly
+
+### Import reads into edgeR
+Remember that the ultimate goal is to find genes that are differntially expressed in different temperatures and/or in different species.  To do this we will us an R package called edgeR.  If you want to learn more about edgeR at some other time, see the users guide at 
+http://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf 
+
+We need to define some variables to describe the experiment and what is in each column of data.  This can be retrieved from the column names
+```{r edgeR_init}
+#first make the rownames reflect the gene
+rownames(results.gene) <- as.character(results.gene$gene)
+results.gene <- results.gene[,-1] #remove the first column (gene names) now that we have added that information to the rownames
+head(results.gene)
+species <- factor(substr(colnames(results.gene),1,3))
+species
+species <- relevel(species,ref="LYC") #set lycospersicum as the reference species
+temp <- substr(colnames(results.gene),5,6)
+temp 
+temp <- factor(sub(".","",temp,fixed=T)) #get rid of the extra period
+temp
+species.temp <- factor(paste(species,temp,sep="."))
+species.temp #one level for each combination of species and temperature
+```
+
+Now import into edgeR and normalize
+```{r}
+library(edgeR)
+dge <- DGEList(counts=results.gene,group=species.temp)
+dim(dge)
+dge <- dge[rowSums(cpm(dge) > 5) >= 3,] #only keep genes where at least 3 samples have more than 5 counts per million
+dim(dge) #how many genes were lost?
+dge <- calcNormFactors(dge) #normalize
+```
+
+We can use a technique known as multi-dimensional scaling to plot differences between the samples.  The further away samples are from each other in the plot below, the more different there gene expression is.
+```{r, eval=FALSE}
+plotMDS(dge) #takes ~ 1 minute
+```
+#### Excercise 6
+Are the samples distributed in a way that makes sense?  Do you see any samples that appear to be mis-labeled?
+
+Our next goal is to estimate the degree of dispersion in our samples.  This allows better detections of differentially expressed genes.
+```{r}
+design <- model.matrix(~ species + temp + species:temp) #describes our experiment.  
+#A main effect term for species and for temp, and an interaction term.
+design #shows which samples belong to each group
+dge <- estimateGLMCommonDisp(dge,design) 
+dge <- estimateGLMTrendedDisp(dge,design) #20 seconds
+
+#normally we would run the line below, bit it gives errors on this data set, so skip it for now.
+#system.time(DGE <- estimateGLMTagwiseDisp(DGE,design))
+```
+
+
+To find differentially expressed genes we fit a statistical model to each gene's expression and then compare it to a simpler model with fewer terms.  
+Fit the full model:
+```{r glmLRT for species}
+fit <- glmFit(dge,design) # The full model
+```
+
+lets now look for genes that are differentially expressed among species.  To do this we "drop" all coefficiencts (or columns) from the design that are related to species.
+```{r}
+colnames(design)
+```
+So we want to drop columns 2, 3, 5, and 6
+```{r}
+lrt.species <- glmLRT(dge,fit,coef=c(2,3,5,6)) #compares the model to one without the species terms
+```
+lets examine the results
+```{r}
+topTags(lrt.species) # shows us the 10 most differentially expressed genes among species
+sum(topTags(lrt.species,n=Inf)$table$adj.P.Val < 0.01) #shows the total number of genes differentially expressed among species at P < 0.01
+```
+What do the columns in the topTags table mean?  
+* logConc: This is for the "reference" condition of LYC.25.  It gives the log2 "concentration" of reads, calculated as log2(read counts in this gene / total read counts)
+* speciesARC: the difference between the reference condition (LYC.25) and ARC.25 in log2 units.  so -1 means that the gene is 2-fold less expressed in ARC than LYC
+* speciesHAB: as above, but for HAB
+* speciesARC.temp8: the difference between ARC.temp8-ARC.temp25 and LYC.temp8-LYC.temp25.  How much more (or less) did ARC respond to 8 than LYC did?
+* speciesHAB.temp8: as above, but for HAB
+* LR: likelihood ratio.  How much more likely is the full model than the reduced model
+* P.Value: an uncorrected P.value.  Don't use this.
+* FDR: P.value corrected for multiple testing.  USe this one.
+
+#### Exercise 7
+Find the top genes differntially expressed by changing temperature.  How many genes have significant changes in expression between 8 and 25? (hint: you do not need to rerun everything...start with the glmLRT() call, changing the coefficents and placing the results in a new object, like lrt.temp)
+```{r exercise7, echo=FALSE, results='hide'}
+lrt.temp <- glmLRT(dge, fit, coef=c(4:6))
+topTags(lrt.temp)
+sum(topTags(lrt.temp,n=Inf)$table$adj.P.Val < 0.01)
+```
+
+#### Exercise 8
+Find the top genes differentially expressed in ARC relative to LYC in response to temperature.  Do a separate analysis to find genes with differential temperature response in HAB relative to LYC.  How many genes are there in each analysis?
+```{r,echo=FALSE,results='hide' }
+lrt.temp.ArcVsLyc <- glmLRT(dge, fit, coef=c(5))
+topTags(lrt.temp.ArcVsLyc)
+sum(topTags(lrt.temp.ArcVsLyc,n=Inf)$table$adj.P.Val < 0.01)
+lrt.temp.HabVsLyc <- glmLRT(dge, fit, coef=c(6))
+topTags(lrt.temp.HabVsLyc)
+sum(topTags(lrt.temp.HabVsLyc,n=Inf)$table$adj.P.Val < 0.01)
+```
+
+### Finding all genes differentialy induced or repressed by temperature for each species.
+The above analyses revealed all genes DE by temperature, or all genes whose respnse to temperature is different in ARC or HAB compared to LYC.  What if instead, for each species, we wanted to know which genes were responsive to temperature?
+
+For LYC this is just the temp8 coefficient:
+```{r}
+lrt.temp.lyc <- glmLRT(dge, fit, coef=4)
+topTags(lrt.temp.lyc)
+sum(topTags(lrt.temp.lyc,n=Inf)$table$adj.P.Val < 0.01)
+```
+
+For ARC we want to compare the ARC column (which is really ARC.25) to the ARC:temp8 column.  For this we have to use contrasts...
+```{r}
+lrt.temp.arc <- glmLRT(dge, fit, contrast=c(0,-1,0,0,1,0)) #note we use "contrast"" rather than "coef".  0s indicate columns we don't want to analyze.  we use -1 and +1 for the columns we want to compare
+topTags(lrt.temp.arc)
+sum(topTags(lrt.temp.arc,n=Inf)$table$adj.P.Val < 0.01)
+```
+
+#### Exercise 9
+how many genes are DE in HAB.25 vs HAB.8?  Which species has the most number of genes that respond to temperature?
+```{r,echo=FALSE,results='hide'}
+lrt.temp.hab <- glmLRT(dge, fit, contrast=c(0,0,-1,0,0,1)) #note we use "contrast"" rather than "coef".  0s indicate columns we don't want to analyze.  we use -1 and +1 for the columns we want to compare
+topTags(lrt.temp.arc)
+sum(topTags(lrt.temp.arc,n=Inf)$table$adj.P.Val < 0.01)
+```

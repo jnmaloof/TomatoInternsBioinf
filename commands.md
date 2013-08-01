@@ -32,3 +32,6 @@ convert .sam file to binary .bam format
 
     samtools view -Sb q20p90.ID.sam > q20p90.ID.bam
 
+indexing .bam file
+
+    samtools index q20p90.ID.sort.bam

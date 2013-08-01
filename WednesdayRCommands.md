@@ -28,7 +28,7 @@ We next need to set /mydata as the working directory for Rstudio.
 ### Open and run SamBam2Counts.R
 
 * Open SamBam2Counts.R .  You can do this by double-clicking on it in the lower righthand pane,  or be using "open" under the File menu, upper lefthand pane.
-* Change the lines starting with inputDir, outputFile, and bam as appropriate
+* Change the lines starting with inputDir and bam as appropriate
 * Select all of the script and type ctrl-enter (cmd-enter on mac)
 * be patient
 * The script will output some stats to the screen.  It also creates an object "results" and writes the results to a tab-delimited file.
@@ -75,4 +75,10 @@ Now that we have our melted file, we can use it in ggplot.  facet_wrap tells ggp
     pl
 
 
+
+
+#### NOTE: To move all bam files to the same directory, run the following
+
+    cd /mydata/
+    mv LYC.mapped/q20p90.LYC-*bam map/
 
