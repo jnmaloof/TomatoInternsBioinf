@@ -2,9 +2,9 @@
 
 ## Converting Bam or Sam to counts
 
-Now that we have mapped our reads to the tomato genes we want to know how many reads map to each gene.  To do this we will use an R script "SamBam2Counts.R".
+Now that we have mapped our reads to the tomato genes we want to know how many reads map to each gene.  To do this we will use an R script "SamBam2counts.R".
 
-* Please use icommands to download the script "SamBam2Counts.R" from the ti-2013 directory on iRods to your /mydata directory.
+* Please use icommands to download the script "SamBam2counts.R" from the ti-2013 directory on iRods to your /mydata directory.
 
 ### Connecting to R on your atmosphere instance
 
