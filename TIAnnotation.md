@@ -267,7 +267,8 @@ eval.go(lrt = lrt.species, ilength = itagLength, go.terms = GO, p.thresh = 0.01)
 ```
 
 ```
-## ```
+##
+```
 
 ```
 ## Using manually entered categories.
