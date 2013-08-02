@@ -1,4 +1,4 @@
-eval.go <- function(lrt,ilength,go.terms,verbose=TRUE,p.thresh=.05,FC.thresh=0,
+eval.go <- function(lrt,ilength,go.terms,verbose=FALSE,p.thresh=.05,FC.thresh=0,
                     go.cutoff=.05,keep.GO="BP",type="GO") {
   require(goseq)
   require(GO.db)
