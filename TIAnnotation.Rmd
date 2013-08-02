@@ -1,0 +1,93 @@
+Annotation and Gene Ontology analysis of differential expression
+========================================================
+
+```{r setwd, echo=FALSE, results='hide'}
+getwd()
+setwd("/mydata")
+getwd()
+load("TIDE.Rdata") #generated in TIDifferentialExpression.Rmd
+library(edgeR)
+```
+
+Having found genes that are differentially expressed we would like to know what these genes are, and if they share any common functions.
+
+Use iget to download the files "TomatoGO.tsv", "TomatoGOSlim.tsv", "ITAG2.3_HRD.tsv", and "eval.go.R" from the ti-2013 directory to /mydata
+
+Now load them into R
+```{r load_preliminaries}
+HRD <- read.delim("/mydata/ITAG2.3_HRD.tsv")
+GO <- read.delim("/mydata/TomatoGO.tsv")
+GOSlim <- read.delim("/mydata/TomatoGOSlim.tsv")
+source("/mydata/eval.go.R")
+```
+
+* The HRD file contains a "human readable description" of each gene. 
+* The GO files contains a numeric key for the Gene Ontology terms associated with each gene (see http://www.geneontology.org/ for more info).  
+* There are two versions of the GO files.  The GOSlim file contains a subset of more general GO terms.
+* eval.go is a helper script that I wrote to automate the GO analysis
+```{r}
+head(HRD)
+head(GO)
+head(GOSlim)
+```
+
+We can merge the descriptions with top tags results as follows:
+```{r mergeHRD}
+results.temp.lyc.hrd <- merge(topTags(lrt.temp.lyc)$table,HRD,by.x="row.names",by.y="ITAG",all.x=T,all.y=F,sort=F)
+head(results.temp.lyc.hrd)
+```
+This shows us the descriptions of the genes most DE by temperature in lyc.
+
+#### Exercise 1
+What is the description of the gene most differentially expressed among species?
+```{r EX1, echo=FALSE,results='hide'}
+results.species.hrd <- merge(topTags(lrt.species)$table,HRD,by.x="row.names",by.y="ITAG",all.x=T,all.y=F,sort=F)
+head(results.species.hrd)
+```
+
+#### Exercise 2
+Are the top 10 genes DE in response to cold similar or different in the 3 species?
+
+Next we will analyze GO categories.  First we need to install a missing package:
+```{r genlen, eval=FALSE}
+source("http://bioconductor.org/biocLite.R")
+biocLite("geneLenDataBase")
+#Answer "y" to any questions and ignore the warning "installed directory not writable..."
+#This only needs to be done once on your machine
+```
+
+Next we need the length of each gene 
+```{r calcLen}
+library(Biostrings)
+itagSeqs <- read.DNAStringSet("/mydata/ITAG2.3_cdna_SHORTNAMES.fasta") #read the fasta file with the genes
+itagLength <- nchar(itagSeqs) #length of each ITAG
+names(itagLength) <- names(itagSeqs) #add the names
+head(itagLength) #check it
+```
+
+Finally we can look for over-representation of GO categories
+Then calling eval.go:
+ * the first argument is an object containing the results from a call to glmLRT
+ * the second argument is an object with the gene lengths
+ * the third argument is an object with the GO terms
+ * the fourth argument is the differential expression cutoff that you want to use
+ 
+```{r gospecies}
+eval.go(lrt=lrt.species, ilength=itagLength, go.terms=GO,p.thresh=.01)
+eval.go(lrt=lrt.species, ilength=itagLength, go.terms=GOSlim,p.thresh=.01)
+
+```
+
+#### Exercise 3
+What GO and GOSlim categories are signficantly over-represented in genes DE by temperature?
+```{r Ex3, echo=FALSE,results='hide', eval=FALSE}
+eval.go(lrt=lrt.temp, ilength=itagLength, go.terms=GO,p.thresh=.01)
+eval.go(lrt=lrt.temp, ilength=itagLength, go.terms=GOSlim,p.thresh=.01)
+```
+
+
+```{r bonus, echo=FALSE,results='hide', eval=FALSE}
+eval.go(lrt=lrt.temp.lyc, ilength=itagLength, go.terms=GOSlim,p.thresh=.01)
+eval.go(lrt=lrt.temp.arc, ilength=itagLength, go.terms=GOSlim,p.thresh=.01)
+eval.go(lrt=lrt.temp.hab, ilength=itagLength, go.terms=GOSlim,p.thresh=.01)
+```
