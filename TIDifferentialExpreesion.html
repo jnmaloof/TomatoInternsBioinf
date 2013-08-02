@@ -184,7 +184,7 @@ hljs.initHighlightingOnLoad();
 
 <h3>Getting started</h3>
 
-<p>It is best to keep a script of your commands in R.  This serves as a record of what you have done and makes it easier to correct mistakes.  To start a new script, click &ldquo;File&gt;New&gt;Rscript&rdquo; in the Rstudio window.  As you work through today&#39;s exercise, type the commands into your new R script.  You can execute each line, or a selection of lines, by typeing ctrl-enter or cmd-enter.  You can save your script by choosing &ldquo;File&gt;Save&rdquo; from the Rstudio menu, or clicking on the disk drive icon.</p>
+<p>It is best to keep a script of your commands in R.  This serves as a record of what you have done and makes it easier to correct mistakes.  To start a new script, click &ldquo;File&gt;New&gt;Rscript&rdquo; in the Rstudio window.  As you work through today&#39;s exercise, type the commands into your new R script.  You can execute each line, or a selection of lines, by typing Ctrl-enter or Cmd-enter.  You can save your script by choosing &ldquo;File&gt;Save&rdquo; from the Rstudio menu, or clicking on the disk drive icon.</p>
 
 <h3>Summarizing counts</h3>
 
@@ -480,7 +480,7 @@ pl
 
 <h3>Import reads into edgeR</h3>
 
-<p>Remember that the ultimate goal is to find genes that are differntially expressed in different temperatures and/or in different species.  To do this we will us an R package called edgeR.  If you want to learn more about edgeR at some other time, see the users guide at 
+<p>Remember that the ultimate goal is to find genes that are differentially expressed in different temperatures and/or in different species.  To do this we will us an R package called edgeR.  If you want to learn more about edgeR at some other time, see the users guide at 
 <a href="http://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf">http://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf</a> </p>
 
 <p>We need to define some variables to describe the experiment and what is in each column of data.  This can be retrieved from the column names</p>
@@ -586,16 +586,16 @@ dim(dge)  #how many genes were lost?
 <pre><code class="r">dge &lt;- calcNormFactors(dge)  #normalize
 </code></pre>
 
-<p>We can use a technique known as multi-dimensional scaling to plot differences between the samples.  The further away samples are from each other in the plot below, the more different there gene expression is.</p>
+<p>We can use a technique known as multi-dimensional scaling to plot differences between the samples.  The further away samples are from each other in the plot below, the more different their gene expression is.</p>
 
 <pre><code class="r">plotMDS(dge)  #takes ~ 1 minute
 </code></pre>
 
-<h4>Excercise 6</h4>
+<h4>Exercise 6</h4>
 
 <p>Are the samples distributed in a way that makes sense?  Do you see any samples that appear to be mis-labeled?</p>
 
-<p>Our next goal is to estimate the degree of dispersion in our samples.  This allows better detections of differentially expressed genes.</p>
+<p>Our next goal is to estimate the degree of dispersion in our samples.  This allows better detection of differentially expressed genes.</p>
 
 <pre><code class="r">design &lt;- model.matrix(~species + temp + species:temp)  #describes our experiment.  
 # A main effect term for species and for temp, and an interaction term.
@@ -671,7 +671,7 @@ Fit the full model:</p>
 <pre><code class="r">fit &lt;- glmFit(dge, design)  # The full model
 </code></pre>
 
-<p>lets now look for genes that are differentially expressed among species.  To do this we &ldquo;drop&rdquo; all coefficiencts (or columns) from the design that are related to species.</p>
+<p>lets now look for genes that are differentially expressed among species.  To do this we &ldquo;drop&rdquo; all coefficients (or columns) from the design that are related to species.</p>
 
 <pre><code class="r">colnames(design)
 </code></pre>
@@ -731,20 +731,20 @@ Fit the full model:</p>
 <li>speciesHAB.temp8: as above, but for HAB</li>
 <li>LR: likelihood ratio.  How much more likely is the full model than the reduced model</li>
 <li>P.Value: an uncorrected P.value.  Don&#39;t use this.</li>
-<li>FDR: P.value corrected for multiple testing.  USe this one.</li>
+<li>FDR: P.value corrected for multiple testing.  Use this one.</li>
 </ul>
 
 <h4>Exercise 7</h4>
 
-<p>Find the top genes differntially expressed by changing temperature.  How many genes have significant changes in expression between 8 and 25? (hint: you do not need to rerun everything&hellip;start with the glmLRT() call, changing the coefficents and placing the results in a new object, like lrt.temp)</p>
+<p>Find the top genes differentially expressed by changing temperature.  How many genes have significant changes in expression between 8 and 25? (hint: you do not need to rerun everything&hellip;start with the glmLRT() call, changing the coefficients and placing the results in a new object, like lrt.temp)</p>
 
 <h4>Exercise 8</h4>
 
 <p>Find the top genes differentially expressed in ARC relative to LYC in response to temperature.  Do a separate analysis to find genes with differential temperature response in HAB relative to LYC.  How many genes are there in each analysis?</p>
 
-<h3>Finding all genes differentialy induced or repressed by temperature for each species.</h3>
+<h3>Finding all genes differentially induced or repressed by temperature for each species.</h3>
 
-<p>The above analyses revealed all genes DE by temperature, or all genes whose respnse to temperature is different in ARC or HAB compared to LYC.  What if instead, for each species, we wanted to know which genes were responsive to temperature?</p>
+<p>The above analyses revealed all genes DE by temperature, or all genes whose response to temperature is different in ARC or HAB compared to LYC.  What if instead, for each species, we wanted to know which genes were responsive to temperature?</p>
 
 <p>For LYC this is just the temp8 coefficient:</p>
 

@@ -4,7 +4,7 @@ Differential Gene Expression Analysis in R
 Yesterday we finished by running SamBam2counts.R to determine the number of counts per gene.  Login to Rstudio Server (point the browser on your laptop to 128.196.142.XXX:8787, *replacing* XXX with the correct digits for your atmosphere instance).
 
 ### Getting started
-It is best to keep a script of your commands in R.  This serves as a record of what you have done and makes it easier to correct mistakes.  To start a new script, click "File>New>Rscript" in the Rstudio window.  As you work through today's exercise, type the commands into your new R script.  You can execute each line, or a selection of lines, by typeing ctrl-enter or cmd-enter.  You can save your script by choosing "File>Save" from the Rstudio menu, or clicking on the disk drive icon.
+It is best to keep a script of your commands in R.  This serves as a record of what you have done and makes it easier to correct mistakes.  To start a new script, click "File>New>Rscript" in the Rstudio window.  As you work through today's exercise, type the commands into your new R script.  You can execute each line, or a selection of lines, by typing Ctrl-enter or Cmd-enter.  You can save your script by choosing "File>Save" from the Rstudio menu, or clicking on the disk drive icon.
 
 ### Summarizing counts
 The results of this analysis should be present in an object called results.  We can examine the beginning of the file by using `head()` and get a summary with `summary()`
@@ -333,7 +333,7 @@ pl
 You may want to press on the "zoom" button to see the plot more clearly
 
 ### Import reads into edgeR
-Remember that the ultimate goal is to find genes that are differntially expressed in different temperatures and/or in different species.  To do this we will us an R package called edgeR.  If you want to learn more about edgeR at some other time, see the users guide at 
+Remember that the ultimate goal is to find genes that are differentially expressed in different temperatures and/or in different species.  To do this we will us an R package called edgeR.  If you want to learn more about edgeR at some other time, see the users guide at 
 http://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf 
 
 We need to define some variables to describe the experiment and what is in each column of data.  This can be retrieved from the column names
@@ -460,16 +460,16 @@ dge <- calcNormFactors(dge)  #normalize
 ```
 
 
-We can use a technique known as multi-dimensional scaling to plot differences between the samples.  The further away samples are from each other in the plot below, the more different there gene expression is.
+We can use a technique known as multi-dimensional scaling to plot differences between the samples.  The further away samples are from each other in the plot below, the more different their gene expression is.
 
 ```r
 plotMDS(dge)  #takes ~ 1 minute
 ```
 
-#### Excercise 6
+#### Exercise 6
 Are the samples distributed in a way that makes sense?  Do you see any samples that appear to be mis-labeled?
 
-Our next goal is to estimate the degree of dispersion in our samples.  This allows better detections of differentially expressed genes.
+Our next goal is to estimate the degree of dispersion in our samples.  This allows better detection of differentially expressed genes.
 
 ```r
 design <- model.matrix(~species + temp + species:temp)  #describes our experiment.  
@@ -554,7 +554,7 @@ fit <- glmFit(dge, design)  # The full model
 ```
 
 
-lets now look for genes that are differentially expressed among species.  To do this we "drop" all coefficiencts (or columns) from the design that are related to species.
+lets now look for genes that are differentially expressed among species.  To do this we "drop" all coefficients (or columns) from the design that are related to species.
 
 ```r
 colnames(design)
@@ -619,10 +619,10 @@ What do the columns in the topTags table mean?
 * speciesHAB.temp8: as above, but for HAB
 * LR: likelihood ratio.  How much more likely is the full model than the reduced model
 * P.Value: an uncorrected P.value.  Don't use this.
-* FDR: P.value corrected for multiple testing.  USe this one.
+* FDR: P.value corrected for multiple testing.  Use this one.
 
 #### Exercise 7
-Find the top genes differntially expressed by changing temperature.  How many genes have significant changes in expression between 8 and 25? (hint: you do not need to rerun everything...start with the glmLRT() call, changing the coefficents and placing the results in a new object, like lrt.temp)
+Find the top genes differentially expressed by changing temperature.  How many genes have significant changes in expression between 8 and 25? (hint: you do not need to rerun everything...start with the glmLRT() call, changing the coefficients and placing the results in a new object, like lrt.temp)
 
 
 
@@ -631,8 +631,8 @@ Find the top genes differentially expressed in ARC relative to LYC in response t
 
 
 
-### Finding all genes differentialy induced or repressed by temperature for each species.
-The above analyses revealed all genes DE by temperature, or all genes whose respnse to temperature is different in ARC or HAB compared to LYC.  What if instead, for each species, we wanted to know which genes were responsive to temperature?
+### Finding all genes differentially induced or repressed by temperature for each species.
+The above analyses revealed all genes DE by temperature, or all genes whose response to temperature is different in ARC or HAB compared to LYC.  What if instead, for each species, we wanted to know which genes were responsive to temperature?
 
 For LYC this is just the temp8 coefficient:
 
