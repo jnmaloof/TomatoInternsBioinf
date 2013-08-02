@@ -631,18 +631,59 @@ Find the top genes differentially expressed in ARC relative to LYC in response t
 
 
 
+# Start here on Friday
+
 ### Finding all genes differentially induced or repressed by temperature for each species.
 The above analyses revealed all genes DE by temperature, or all genes whose response to temperature is different in ARC or HAB compared to LYC.  What if instead, for each species, we wanted to know which genes were responsive to temperature?
 
-For LYC this is just the temp8 coefficient:
+To do this we need to set up our design matrix a bit differently.
 
 ```r
-lrt.temp.lyc <- glmLRT(dge, fit, coef = 4)
+design2 <- model.matrix(~0 + species.temp)
+colnames(design2) <- levels(species.temp)
+fit2 <- glmFit(dge, design2)  #fit a new full model, corresponding to this deisgn
+design2  #look at the new design
+```
+
+```
+##    ARC.25 ARC.8 HAB.25 HAB.8 LYC.25 LYC.8
+## 1       1     0      0     0      0     0
+## 2       1     0      0     0      0     0
+## 3       1     0      0     0      0     0
+## 4       0     1      0     0      0     0
+## 5       0     1      0     0      0     0
+## 6       0     1      0     0      0     0
+## 7       0     0      1     0      0     0
+## 8       0     0      1     0      0     0
+## 9       0     0      1     0      0     0
+## 10      0     0      1     0      0     0
+## 11      0     0      0     1      0     0
+## 12      0     0      0     1      0     0
+## 13      0     0      0     1      0     0
+## 14      0     0      0     0      1     0
+## 15      0     0      0     0      1     0
+## 16      0     0      0     0      1     0
+## 17      0     0      0     0      1     0
+## 18      0     0      0     0      0     1
+## 19      0     0      0     0      0     1
+## attr(,"assign")
+## [1] 1 1 1 1 1 1
+## attr(,"contrasts")
+## attr(,"contrasts")$species.temp
+## [1] "contr.treatment"
+```
+
+Now we have a column corresponding to each species/temp combination
+
+To look for genes DE by temp in lyc, we just contrast those columns:
+
+```r
+lrt.temp.lyc <- glmLRT(dge, fit2, contrast = c(0, 0, 0, 0, -1, 1))
 topTags(lrt.temp.lyc)
 ```
 
 ```
-## Coefficient:  temp8 
+## Coefficient:  -1*LYC.25 1*LYC.8 
 ##                    logConc      logFC    LR    P.Value        FDR
 ## Solyc05g007950.2.1  -9.357  6.620e+00 497.6 3.088e-110 5.753e-106
 ## Solyc02g014860.2.1 -10.000  5.960e+00 346.5  2.414e-77  2.248e-73
@@ -657,46 +698,64 @@ topTags(lrt.temp.lyc)
 ```
 
 ```r
-sum(topTags(lrt.temp.lyc, n = Inf)$table$adj.P.Val < 0.01)
+# we can get a summary of the number of genes up and down regulated at 8
+# degrees with:
+summary(decideTestsDGE(lrt.temp.lyc))
 ```
 
 ```
-## [1] 4677
-```
-
-
-For ARC we want to compare the ARC column (which is really ARC.25) to the ARC:temp8 column.  For this we have to use contrasts...
-
-```r
-lrt.temp.arc <- glmLRT(dge, fit, contrast = c(0, -1, 0, 0, 1, 0))
-topTags(lrt.temp.arc)
-```
-
-```
-## Coefficient:  -1*speciesARC 1*speciesARC:temp8 
-##                    logConc      logFC    LR   P.Value       FDR
-## Solyc11g072200.1.1 -10.162  1.267e+01 301.4 1.609e-67 2.998e-63
-## Solyc07g064720.2.1 -10.062 -9.820e+00 258.3 3.997e-58 3.723e-54
-## Solyc03g116390.2.1 -11.653 -1.443e+08 216.6 5.025e-49 3.120e-45
-## Solyc08g023660.2.1 -10.255  1.611e+01 182.5 1.393e-41 6.486e-38
-## Solyc07g065160.2.1 -10.105 -7.189e+00 152.2 5.705e-35 2.126e-31
-## Solyc03g025810.2.1 -11.876 -1.615e+01 146.9 8.407e-34 2.610e-30
-## Solyc02g065190.2.1 -10.363  8.053e+00 118.7 1.217e-27 3.238e-24
-## Solyc08g014490.1.1 -10.510  7.738e+00 117.2 2.633e-27 6.130e-24
-## Solyc01g073840.1.1 -10.721 -9.174e+00 114.7 9.246e-27 1.914e-23
-## Solyc03g005340.2.1  -9.671  7.294e+00 114.2 1.208e-26 2.250e-23
-```
-
-```r
-sum(topTags(lrt.temp.arc, n = Inf)$table$adj.P.Val < 0.01)
-```
-
-```
-## [1] 1568
+##    [,1] 
+## -1  3376
+## 0  12164
+## 1   3089
 ```
 
 
 #### Exercise 9
-how many genes are DE in HAB.25 vs HAB.8?  Which species has the most number of genes that respond to temperature?
+how many genes are DE in HAB.25 vs HAB.8?  And in ARC.25 vs ARC.8? Which species has the most number of genes that respond to temperature?
 
+
+
+Finally it would be interesting to know the overlap among temperature regulated genes among species.
+
+First we classify each gene as being up-regulated, down-regulated, or not affected
+
+```r
+de.lrt.lyc <- decideTestsDGE(lrt.temp.lyc)
+de.lrt.arc <- decideTestsDGE(lrt.temp.arc)
+de.lrt.hab <- decideTestsDGE(lrt.temp.hab)
+```
+
+
+Combine them into a single matrix
+
+```r
+de.temp <- cbind(de.lrt.lyc, de.lrt.arc, de.lrt.hab)
+colnames(de.temp) <- c("Lyc", "Arc", "Hab")
+```
+
+
+Plot it!
+
+```r
+vennDiagram(de.temp, include = "up")  #overlap among up-regulated genes
+```
+
+![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-171.png) 
+
+```r
+vennDiagram(de.temp, include = "down")  #overlap among down-regulated genes
+```
+
+![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-172.png) 
+
+```r
+vennDiagram(de.temp, include = "both")  #overlap among all DE genes
+```
+
+![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-173.png) 
+
+
+#### Exercise 10
+Looking at the final plot, how many genes are DE in all species?  How many genes are only DE in Habrochaites?
 

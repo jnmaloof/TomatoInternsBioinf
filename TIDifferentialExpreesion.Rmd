@@ -203,27 +203,61 @@ topTags(lrt.temp.HabVsLyc)
 sum(topTags(lrt.temp.HabVsLyc,n=Inf)$table$adj.P.Val < 0.01)
 ```
 
+# Start here on Friday
+
 ### Finding all genes differentially induced or repressed by temperature for each species.
 The above analyses revealed all genes DE by temperature, or all genes whose response to temperature is different in ARC or HAB compared to LYC.  What if instead, for each species, we wanted to know which genes were responsive to temperature?
 
-For LYC this is just the temp8 coefficient:
+To do this we need to set up our design matrix a bit differently.
 ```{r}
-lrt.temp.lyc <- glmLRT(dge, fit, coef=4)
-topTags(lrt.temp.lyc)
-sum(topTags(lrt.temp.lyc,n=Inf)$table$adj.P.Val < 0.01)
+design2 <- model.matrix(~0+species.temp)
+colnames(design2) <- levels(species.temp)
+fit2 <- glmFit(dge,design2) #fit a new full model, corresponding to this deisgn
+design2 #look at the new design
 ```
+Now we have a column corresponding to each species/temp combination
 
-For ARC we want to compare the ARC column (which is really ARC.25) to the ARC:temp8 column.  For this we have to use contrasts...
+To look for genes DE by temp in lyc, we just contrast those columns:
 ```{r}
-lrt.temp.arc <- glmLRT(dge, fit, contrast=c(0,-1,0,0,1,0)) #note we use "contrast"" rather than "coef".  0s indicate columns we don't want to analyze.  we use -1 and +1 for the columns we want to compare
-topTags(lrt.temp.arc)
-sum(topTags(lrt.temp.arc,n=Inf)$table$adj.P.Val < 0.01)
+lrt.temp.lyc <- glmLRT(dge,fit2,contrast=c(0,0,0,0,-1,1))
+topTags(lrt.temp.lyc)
+#we can get a summary of the number of genes up and down regulated at 8 degrees with:
+summary(decideTestsDGE(lrt.temp.lyc))
 ```
 
 #### Exercise 9
-how many genes are DE in HAB.25 vs HAB.8?  Which species has the most number of genes that respond to temperature?
+how many genes are DE in HAB.25 vs HAB.8?  And in ARC.25 vs ARC.8? Which species has the most number of genes that respond to temperature?
 ```{r,echo=FALSE,results='hide'}
-lrt.temp.hab <- glmLRT(dge, fit, contrast=c(0,0,-1,0,0,1)) #note we use "contrast"" rather than "coef".  0s indicate columns we don't want to analyze.  we use -1 and +1 for the columns we want to compare
+lrt.temp.hab <- glmLRT(dge,fit2,contrast=c(0,0,-1,1,0,0))
+topTags(lrt.temp.hab)
+summary(decideTestsDGE(lrt.temp.hab))
+lrt.temp.arc <- glmLRT(dge,fit2,contrast=c(-1,1,0,0,0,0))
 topTags(lrt.temp.arc)
-sum(topTags(lrt.temp.arc,n=Inf)$table$adj.P.Val < 0.01)
+summary(decideTestsDGE(lrt.temp.arc))
 ```
+
+Finally it would be interesting to know the overlap among temperature regulated genes among species.
+
+First we classify each gene as being up-regulated, down-regulated, or not affected
+```{r}
+de.lrt.lyc <- decideTestsDGE(lrt.temp.lyc)
+de.lrt.arc <- decideTestsDGE(lrt.temp.arc)
+de.lrt.hab <- decideTestsDGE(lrt.temp.hab)
+```
+
+Combine them into a single matrix
+```{r}
+de.temp <- cbind(de.lrt.lyc,de.lrt.arc,de.lrt.hab)
+colnames(de.temp) <- c("Lyc","Arc","Hab")
+```
+
+Plot it!
+```{r}
+vennDiagram(de.temp,include="up") #overlap among up-regulated genes
+vennDiagram(de.temp,include="down") #overlap among down-regulated genes
+vennDiagram(de.temp,include="both") #overlap among all DE genes
+```
+
+#### Exercise 10
+Looking at the final plot, how many genes are DE in all species?  How many genes are only DE in Habrochaites?
+
