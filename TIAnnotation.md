@@ -209,9 +209,10 @@ Then calling eval.go:
  * the second argument is an object with the gene lengths
  * the third argument is an object with the GO terms
  * the fourth argument is the differential expression cutoff that you want to use
+ 
 
 ```r
-eval.go(lrt = lrt.species, ilength = itagLength, go.terms = GO, p.thresh = 0.01)
+require(goseq)
 ```
 
 ```
@@ -224,6 +225,10 @@ eval.go(lrt = lrt.species, ilength = itagLength, go.terms = GO, p.thresh = 0.01)
 
 ```
 ## Loading required package: geneLenDataBase
+```
+
+```r
+require(GO.db)
 ```
 
 ```
@@ -268,6 +273,16 @@ eval.go(lrt = lrt.species, ilength = itagLength, go.terms = GO, p.thresh = 0.01)
 
 ```
 ## ```
+
+```r
+require(edgeR)
+```
+
+
+
+```r
+eval.go(lrt = lrt.species, ilength = itagLength, go.terms = GO, p.thresh = 0.01)
+```
 
 ```
 ## Using manually entered categories.

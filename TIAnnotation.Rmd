@@ -72,10 +72,15 @@ Then calling eval.go:
  * the third argument is an object with the GO terms
  * the fourth argument is the differential expression cutoff that you want to use
  
+```{r load libraries for eval.go}
+  require(goseq)
+  require(GO.db)
+  require(edgeR)
+``` 
+
 ```{r gospecies}
 eval.go(lrt=lrt.species, ilength=itagLength, go.terms=GO,p.thresh=.01)
-eval.go(lrt=lrt.species, ilength=itagLength, go.terms=GOSlim,p.thresh=.01)
-
+eval.go(lrt=lrt.species, ilength=itagLength, go.terms=GOSlim,p.thresh=.01) 
 ```
 
 #### Exercise 3

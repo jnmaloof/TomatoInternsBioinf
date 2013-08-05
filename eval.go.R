@@ -1,7 +1,8 @@
-eval.go <- function(lrt,ilength,go.terms,verbose=FALSE,p.thresh=.05,FC.thresh=0,
+eval.go <- function(lrt,ilength,go.terms,verbose=TRUE,p.thresh=.05,FC.thresh=0,
                     go.cutoff=.05,keep.GO="BP",type="GO") {
   require(goseq)
   require(GO.db)
+  require(edgeR)
   gene.names <- row.names(topTags(lrt,n=Inf)$table)  
   
   #add GO: header if needed
@@ -57,7 +58,7 @@ eval.go <- function(lrt,ilength,go.terms,verbose=FALSE,p.thresh=.05,FC.thresh=0,
     de.go$over.pval.adjust <- p.adjust(de.go$over,"fdr")
     
     #truncate to go.cutoff threshold
-    de.go <- de.go[de.go$deval<go.cutoff,]
+    de.go <- de.go[de.go$over.pval.adjust<go.cutoff,]
     
     list(de=de.go)
     
@@ -105,8 +106,8 @@ eval.go <- function(lrt,ilength,go.terms,verbose=FALSE,p.thresh=.05,FC.thresh=0,
     down.go$over_pval.adjust <- p.adjust(down.go$over,"fdr")
     
     #truncate to go.cutoff threshold
-    up.go <- up.go[up.go$upval<go.cutoff,]
-    down.go <- down.go[down.go$upval<go.cutoff,]
+    up.go <- up.go[up.go$over_pval.adjust<go.cutoff,]
+    down.go <- down.go[down.go$over_pval.adjust<go.cutoff,]
     
     list(up=up.go,down=down.go)
   }
