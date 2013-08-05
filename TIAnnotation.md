@@ -272,8 +272,7 @@ require(GO.db)
 ```
 
 ```
-##
-```
+## ```
 
 ```r
 require(edgeR)

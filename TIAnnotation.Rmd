@@ -2,9 +2,7 @@ Annotation and Gene Ontology analysis of differential expression
 ========================================================
 
 ```{r setwd, echo=FALSE, results='hide'}
-getwd()
-setwd("/mydata")
-getwd()
+opts_knit$set(root.dir = '/mydata/')
 load("TIDE.Rdata") #generated in TIDifferentialExpression.Rmd
 library(edgeR)
 ```
